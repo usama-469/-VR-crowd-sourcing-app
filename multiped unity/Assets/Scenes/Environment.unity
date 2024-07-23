@@ -9166,9 +9166,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22d0e52bf168849489e7c0b22ffccc8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myDataList:
-    _data: []
-  writeFileName: test n6
+  writeFileName: usama
   writeFilePath: 
   conditionFinished: 0
   LEDBumperObject: {fileID: 566537598739974183}
@@ -9215,10 +9213,11 @@ MonoBehaviour:
   Q1: {fileID: 1676560529}
   Q2: {fileID: 1425567046}
   Q3: {fileID: 1402217872}
-  slider1: {fileID: 1272988037}
+  slider1: {fileID: 743351016}
   slider2: {fileID: 1272988037}
   startNextStage: 0
   toggleGroup: {fileID: 1957143403}
+  mainData: []
   write_data: 0
   filePath: 
   name: 
@@ -13896,7 +13895,7 @@ GameObject:
   - component: {fileID: 743351015}
   - component: {fileID: 743351016}
   m_Layer: 0
-  m_Name: Slider
+  m_Name: Slider1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -25492,7 +25491,7 @@ GameObject:
   - component: {fileID: 1272988036}
   - component: {fileID: 1272988037}
   m_Layer: 0
-  m_Name: Slider
+  m_Name: Slider2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

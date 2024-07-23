@@ -26,24 +26,12 @@ public class Trial {
 }
 
 
+
 public class ConditionController : MonoBehaviour
 {
-    //------------for writing
-    [System.Serializable]
-    public class Data
-    {
-        public string vid_name;     //for the videoID
-        public float A1;      //Answer 1-3
-        public float A2;
-        public string A3;
-    }
-    [System.Serializable]
-    public class DataList
-    {
-        public Data[] _data;
-    }
 
-    public DataList myDataList = new DataList();
+
+    
     public string writeFileName = "a";       //write the name of the file for storing the data into----------a for standard
     public string writeFilePath = "";           //where the file will be saved
 
@@ -108,8 +96,14 @@ public class ConditionController : MonoBehaviour
 
     public void Start()
     {
-        writeFilePath = Application.dataPath +"/" +  writeFileName + ".csv";            //the patth to stroe the files with the given filename---------------------change it for unique files
-         
+        writeFilePath = Application.dataPath +"/" +  writeFileName + DateTime.Now.ToString("yyyyMMdd_HHmmss") +  ".csv";            //the patth to stroe the files with the given filename---------------------change it for unique files
+
+        if (File.Exists(writeFilePath))
+        {
+            Debug.Log("File already exists, deleting...");
+            File.Delete(writeFilePath);
+        }
+
         Debug.Log("Start");
         // Import trial data
         string filePath = Application.dataPath + "/../../public/videos/mapping.csv";
@@ -121,7 +115,8 @@ public class ConditionController : MonoBehaviour
         buttonSound = GetComponent<AudioSource>();
 
         //usama code
-        myDataList._data = new Data[numberConditions]; // generating a data list of our total number of conditions
+        
+        
 
         Start2();
 
@@ -509,20 +504,20 @@ public class ConditionController : MonoBehaviour
     {
 
         Debug.Log("----------file writing triggered");
-        if (myDataList._data.Length > 0)
-        {
+        
+        
 
                 TextWriter tw = new StreamWriter(writeFilePath, false);
                 tw.WriteLine("Video ID, Answer1, Answer2, Answer3");        //headings
                 tw.Close();
             
-            tw = new StreamWriter(writeFilePath, true);
-            for (int i = 0; i < myDataList._data.Length; i++)
-            {
-                tw.WriteLine(myDataList._data[i].vid_name + "," + myDataList._data[i].A1 + "," + myDataList._data[i].A2 + "," + myDataList._data[i].A3);            //WRITING format for the data
-            }
-            tw.Close();   
-        }
+
+        File.WriteAllLines(writeFilePath, mainData);
+        
+        //mainData.Clear();            //emoptyy the file
+
+        tw.Close();   
+        
   
     }
 
@@ -539,7 +534,7 @@ public class ConditionController : MonoBehaviour
         Debug.Log("Question 1 triggered--------------");
         //take the experiment number and put it as an array number
         answer_element = conditionCounter;
-        myDataList._data[answer_element].vid_name = trials[conditionCounter].video_id;      //add the video ID name
+        
 
 
  
@@ -547,7 +542,7 @@ public class ConditionController : MonoBehaviour
 
     public void Question2()     //call this on the press of next button on q1
     {
-        myDataList._data[answer_element].A1 = slider1.value;
+        
         Q1.SetActive(false);
 
         Q2.SetActive(true);
@@ -557,7 +552,7 @@ public class ConditionController : MonoBehaviour
     }
     public void Question3() //call this on the press of next button on q2
     {
-        myDataList._data[answer_element].A2 = slider2.value;
+        
         Q2.SetActive(false);
 
         Q3.SetActive(true);
@@ -566,6 +561,8 @@ public class ConditionController : MonoBehaviour
 
     }
     public ToggleGroup toggleGroup;
+
+    public List<string> mainData = new List<string>();
     public void LastQuestion()
     {
 
@@ -573,9 +570,10 @@ public class ConditionController : MonoBehaviour
 
 
         Toggle toggle = toggleGroup.ActiveToggles().FirstOrDefault();
-        myDataList._data[answer_element].A3 = toggle.GetComponentInChildren<Text>().text;
 
+        string mainLine = $"{trials[conditionCounter].video_id},{slider1.value},{slider2.value},{toggle.GetComponentInChildren<Text>().text}";
 
+        mainData.Add(mainLine);
         Q3.SetActive(false);
         //resetting values
         slider1.value = 0;
@@ -610,49 +608,6 @@ public class ConditionController : MonoBehaviour
 
         string triggerButtonState = "False";
         string gripButtonState = "False";
-
-        //if (_inputData._rightController.TryGetFeatureValue(CommonUsages.deviceVelocity, out Vector3 rightVelocity))
-        //{
-        //    _rightMaxScore = Mathf.Max(rightVelocity.magnitude, _rightMaxScore);
-        //    rightMaxVelocity = _rightMaxScore.ToString("F2");
-        //    Debug.Log("Right Controller Max Velocity: " + rightMaxVelocity);
-        //}
-
-        //if (_inputData._rightController.TryGetFeatureValue(CommonUsages.primaryButton, out bool primaryButtonValue))
-        //{
-        //    primaryButtonState = primaryButtonValue.ToString();
-        //    if (primaryButtonValue)
-        //    {
-        //        Debug.Log("Right Controller Primary Button Pressed");
-        //    }
-        //}
-
-        //if (_inputData._rightController.TryGetFeatureValue(CommonUsages.secondaryButton, out bool secondaryButtonValue))
-        //{
-        //    secondaryButtonState = secondaryButtonValue.ToString();
-        //    if (secondaryButtonValue)
-        //    {
-        //        Debug.Log("Right Controller Secondary Button Pressed");
-        //    }
-        //}
-
-        //if (_inputData._rightController.TryGetFeatureValue(CommonUsages.triggerButton, out bool triggerButtonValue))
-        //{
-        //    triggerButtonState = triggerButtonValue.ToString();
-        //    if (triggerButtonValue)
-        //    {
-        //        Debug.Log("Right Controller Trigger Button Pressed");
-        //    }
-        //}
-
-        //if (_inputData._rightController.TryGetFeatureValue(CommonUsages.gripButton, out bool gripButtonValue))
-        //{
-        //    gripButtonState = gripButtonValue.ToString();
-        //    if (gripButtonValue)
-        //    {
-        //        Debug.Log("Right Controller Grip Button Pressed");
-        //    }
-        //}
 
         if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger))
         {
@@ -694,26 +649,16 @@ public class ConditionController : MonoBehaviour
         {
             //use a writing data function with video name
 
-            name = myDataList._data[answer_element].vid_name;            // the current video name
+            name = trials[conditionCounter].video_id;            // the current video name
             filePath = Application.dataPath + "/" + name + ".csv";
 
             TextWriter tw = new StreamWriter(filePath, false);
-            //tw.WriteLine("Video ID, Answer1, Answer2, Answer3");        //headings
+            
             tw.Close();
 
             
 
             File.WriteAllLines(filePath, csvData);
-
-
-            //tw = new StreamWriter(writeFilePath, true);
-            //for (int i = 0; i < myDataList._data.Length; i++)
-            //{
-            //    tw.WriteLine(myDataList._data[i].vid_name + "," + myDataList._data[i].A1 + "," + myDataList._data[i].A2 + "," + myDataList._data[i].A3);            //WRITING format for the data
-            //}
-            //tw.Close();
-            //File.WriteAllLines(filePath, csvData); 
-
             write_data = false;
             csvData.Clear();            //emoptyy the file
         } 
